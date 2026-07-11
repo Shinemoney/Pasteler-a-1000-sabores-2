@@ -1,156 +1,352 @@
-import React, { useContext } from 'react';
+import React, { useContext, useEffect, useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { CartContext } from '../context/CartContext';
+import { AuthContext } from '../context/AuthContext';
+import './CartCheckout.css';
 
-const estadoLabel = {
-  preparacion: 'En preparación',
-  despacho: 'En despacho',
-  entrega: 'Entregado',
-};
+const regionesChile = [
+  'Región de Arica y Parinacota',
+  'Región de Tarapacá',
+  'Región de Antofagasta',
+  'Región de Atacama',
+  'Región de Coquimbo',
+  'Región de Valparaíso',
+  'Región Metropolitana de Santiago',
+  'Región del Libertador General Bernardo O’Higgins',
+  'Región del Maule',
+  'Región de Ñuble',
+  'Región del Biobío',
+  'Región de La Araucanía',
+  'Región de Los Ríos',
+  'Región de Los Lagos',
+  'Región de Aysén del General Carlos Ibáñez del Campo',
+  'Región de Magallanes y de la Antártica Chilena',
+];
+
+const comunasSugeridas = [
+  'Cerrillos',
+  'Cerro Navia',
+  'Conchalí',
+  'El Bosque',
+  'Estación Central',
+  'Huechuraba',
+  'Independencia',
+  'La Cisterna',
+  'La Florida',
+  'La Granja',
+  'La Pintana',
+  'La Reina',
+  'Las Condes',
+  'Lo Barnechea',
+  'Lo Espejo',
+  'Lo Prado',
+  'Macul',
+  'Maipú',
+  'Ñuñoa',
+  'Pedro Aguirre Cerda',
+  'Peñalolén',
+  'Providencia',
+  'Pudahuel',
+  'Quilicura',
+  'Quinta Normal',
+  'Recoleta',
+  'Renca',
+  'San Joaquín',
+  'San Miguel',
+  'San Ramón',
+  'Santiago',
+  'Vitacura',
+];
 
 const Cart = () => {
-  const {
-    cart,
-    resumen,
-    pedidoActual,
-    removeFromCart,
-    updateCantidad,
-    confirmarPedido,
-    avanzarEstadoPedido,
-    limpiarPedidoActual,
-  } = useContext(CartContext);
+  const navigate = useNavigate();
+  const { cart, resumen, removeFromCart, updateCantidad, confirmarPedido, clearCart } = useContext(CartContext);
+  const { currentUser, isAdmin } = useContext(AuthContext);
 
-  const finalizarDirecto = () => {
-    const fechaDefault = new Date();
-    fechaDefault.setDate(fechaDefault.getDate() + 1);
+  const [formData, setFormData] = useState({
+    nombre: '',
+    apellidos: '',
+    correo: '',
+    calle: '',
+    departamento: '603',
+    region: 'Región Metropolitana de Santiago',
+    comuna: 'Cerrillos',
+    indicaciones: '',
+    fechaEntregaPreferida: '',
+  });
 
-    confirmarPedido({
-      fechaEntrega: fechaDefault.toISOString().split('T')[0],
-      direccionEntrega: 'Dirección no especificada',
-    });
+  const [errors, setErrors] = useState({});
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+
+  const total = useMemo(() => (resumen?.total ? resumen.total : 0), [resumen]);
+
+  useEffect(() => {
+    if (!currentUser || isAdmin) return;
+
+    setFormData((prev) => ({
+      ...prev,
+      nombre: prev.nombre || currentUser.nombre || '',
+      apellidos: prev.apellidos || currentUser.apellidos || '',
+      correo: prev.correo || currentUser.correo || currentUser.email || '',
+    }));
+  }, [currentUser, isAdmin]);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+    setErrors((prev) => ({ ...prev, [name]: '' }));
   };
 
+  const validar = () => {
+    const nuevosErrores = {};
+
+    if (!formData.nombre.trim()) nuevosErrores.nombre = 'Ingresa tu nombre';
+    if (!formData.apellidos.trim()) nuevosErrores.apellidos = 'Ingresa tus apellidos';
+
+    if (!formData.correo.trim()) {
+      nuevosErrores.correo = 'Ingresa tu correo';
+    } else if (!/\S+@\S+\.\S+/.test(formData.correo)) {
+      nuevosErrores.correo = 'Correo inválido';
+    }
+
+    if (!formData.calle.trim()) nuevosErrores.calle = 'Ingresa tu calle';
+    if (!formData.region.trim()) nuevosErrores.region = 'Selecciona una región';
+    if (!formData.comuna.trim()) nuevosErrores.comuna = 'Selecciona una comuna';
+
+    setErrors(nuevosErrores);
+    return Object.keys(nuevosErrores).length === 0;
+  };
+
+  const confirmarPago = () => {
+    const fechaEntrega = formData.fechaEntregaPreferida || new Date().toISOString().split('T')[0];
+    const direccionCompleta = `${formData.calle}${formData.departamento ? `, Depto ${formData.departamento}` : ''}, ${formData.comuna}, ${formData.region}`;
+
+    const resultado = confirmarPedido({
+      fechaEntrega,
+      direccionEntrega: direccionCompleta,
+      cliente: {
+        nombre: formData.nombre,
+        apellidos: formData.apellidos,
+        correo: formData.correo,
+      },
+      direccionDetalle: {
+        calle: formData.calle,
+        departamento: formData.departamento,
+        region: formData.region,
+        comuna: formData.comuna,
+        indicaciones: formData.indicaciones,
+      },
+      notasEntrega: formData.indicaciones,
+    });
+
+    if (resultado?.ok) {
+      setShowConfirmModal(false);
+      navigate('/compra-resultado/exito');
+    }
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (!cart?.length) return;
+    if (!validar()) return;
+    setShowConfirmModal(true);
+  };
+
+  if (!cart.length) {
+    return (
+      <main className="cart-checkout-page">
+        <div className="cart-checkout-card empty-cart-checkout">
+          <h2>Tu carrito está vacío</h2>
+          <p>Agrega productos para completar tu pedido.</p>
+        </div>
+      </main>
+    );
+  }
+
   return (
-    <div className="cart-container" style={{ padding: '20px', maxWidth: '900px', margin: 'auto' }}>
-      <h1>Tu Carrito</h1>
+    <main className="cart-checkout-page">
+      <form className="cart-compact-layout" onSubmit={handleSubmit}>
+        <section className="cart-products-panel">
+          <header className="panel-header">
+            <h2>Lista de productos</h2>
+            <p>Agrega más productos desde el catálogo para completar tu compra.</p>
+          </header>
 
-      {cart.length === 0 ? (
-        <p style={{ textAlign: 'center', marginTop: '20px' }}>Tu carrito está vacío</p>
-      ) : (
-        <>
-          {cart.map((item) => (
-            <div
-              key={item.id}
-              className="cart-item"
-              style={{
-                borderBottom: '1px solid #ccc',
-                padding: '10px 0',
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-              }}
-            >
-              <div>
+          <div className="cart-products-grid">
+            {cart.map((item) => (
+              <article key={`mini-${item.id}`} className="product-mini-card">
+                <img src={item.imagen || '/favicon.svg'} alt={item.nombre} className="product-mini-image" />
                 <h3>{item.nombre}</h3>
-                {item.descuentoPct > 0 ? (
-                  <>
-                    <p style={{ margin: 0 }}>
-                      <span style={{ textDecoration: 'line-through', color: '#777' }}>
-                        ${item.precioOriginal.toLocaleString()} CLP
-                      </span>{' '}
-                      <span style={{ color: '#b12704', fontWeight: 700 }}>-{item.descuentoPct}%</span>
-                    </p>
-                    <p style={{ margin: '2px 0 0 0', fontWeight: 700 }}>
-                      ${item.precio.toLocaleString()} CLP
-                    </p>
-                  </>
-                ) : (
-                  <p>${item.precio.toLocaleString()} CLP</p>
-                )}
-                <small>Subtotal: ${(item.precio * item.cantidad).toLocaleString()} CLP</small>
-              </div>
-              <div className="cart-controls">
-                <button onClick={() => updateCantidad(item.id, -1)}>-</button>
-                <span style={{ margin: '0 10px' }}>{item.cantidad}</span>
-                <button onClick={() => updateCantidad(item.id, 1)}>+</button>
-                <button onClick={() => removeFromCart(item.id)} style={{ marginLeft: '15px', color: 'red' }}>
-                  🗑️
-                </button>
-              </div>
-            </div>
-          ))}
-
-          <div style={{ marginTop: '20px', textAlign: 'right' }}>
-            <p>Productos: {resumen.cantidadTotal}</p>
-            <p>Subtotal: ${resumen.subtotal.toLocaleString()} CLP</p>
-            <p>Ahorro total: -${resumen.ahorroTotal.toLocaleString()} CLP</p>
-            <p>Despacho: ${resumen.despacho.toLocaleString()} CLP</p>
-            <h2>Total: ${resumen.total.toLocaleString()} CLP</h2>
-            <button
-              onClick={finalizarDirecto}
-              style={{
-                backgroundColor: '#8b4513',
-                color: 'white',
-                padding: '12px 24px',
-                border: 'none',
-                cursor: 'pointer',
-                fontSize: '1rem',
-              }}
-            >
-              Confirmar Pedido
-            </button>
-          </div>
-        </>
-      )}
-
-      {pedidoActual && (
-        <div
-          style={{
-            marginTop: '30px',
-            background: '#fff',
-            border: '1px solid #ddd',
-            borderRadius: '8px',
-            padding: '15px',
-          }}
-        >
-          <h2>Seguimiento del Pedido</h2>
-          <p>
-            <strong>ID Pedido:</strong> {pedidoActual.id}
-          </p>
-          <p>
-            <strong>Estado:</strong> {estadoLabel[pedidoActual.estado] || pedidoActual.estado}
-          </p>
-          <p>
-            <strong>Código de seguimiento:</strong> {pedidoActual.tracking.codigo}
-          </p>
-          <p>
-            <strong>Fecha entrega preferida:</strong> {pedidoActual.boleta.fechaEntregaPreferida}
-          </p>
-
-          <h3>Boleta</h3>
-          <p>
-            <strong>Folio:</strong> {pedidoActual.boleta.folio}
-          </p>
-          <p>
-            <strong>Total boleta:</strong> ${pedidoActual.boleta.total.toLocaleString()} CLP
-          </p>
-
-          <div style={{ marginTop: '10px' }}>
-            <h4>Historial de estados</h4>
-            {pedidoActual.tracking.historial.map((h, idx) => (
-              <div key={`${h.timestamp}-${idx}`} style={{ marginBottom: '6px' }}>
-                <strong>{estadoLabel[h.estado] || h.estado}</strong> - {new Date(h.timestamp).toLocaleString()}
-                <div>{h.descripcion}</div>
-              </div>
+                <p>$ {item.precio.toLocaleString()}</p>
+              </article>
             ))}
           </div>
 
-          <div style={{ marginTop: '15px', display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
-            <button onClick={avanzarEstadoPedido}>Actualizar estado</button>
-            <button onClick={limpiarPedidoActual}>Limpiar seguimiento</button>
+          <section className="checkout-section compact">
+            <h3>Datos para finalizar compra</h3>
+            <div className="checkout-grid">
+              <div className="checkout-field">
+                <label htmlFor="nombre">Nombre*</label>
+                <input id="nombre" name="nombre" value={formData.nombre} onChange={handleChange} />
+                {errors.nombre && <span className="field-error">{errors.nombre}</span>}
+              </div>
+
+              <div className="checkout-field">
+                <label htmlFor="apellidos">Apellidos*</label>
+                <input id="apellidos" name="apellidos" value={formData.apellidos} onChange={handleChange} />
+                {errors.apellidos && <span className="field-error">{errors.apellidos}</span>}
+              </div>
+
+              <div className="checkout-field full">
+                <label htmlFor="correo">Correo*</label>
+                <input id="correo" name="correo" type="email" value={formData.correo} onChange={handleChange} />
+                {errors.correo && <span className="field-error">{errors.correo}</span>}
+              </div>
+
+              <div className="checkout-field">
+                <label htmlFor="calle">Calle*</label>
+                <input id="calle" name="calle" value={formData.calle} onChange={handleChange} />
+                {errors.calle && <span className="field-error">{errors.calle}</span>}
+              </div>
+
+              <div className="checkout-field">
+                <label htmlFor="departamento">Departamento</label>
+                <input id="departamento" name="departamento" value={formData.departamento} onChange={handleChange} />
+              </div>
+
+              <div className="checkout-field">
+                <label htmlFor="region">Región*</label>
+                <select id="region" name="region" value={formData.region} onChange={handleChange}>
+                  {regionesChile.map((region) => (
+                    <option key={region} value={region}>
+                      {region}
+                    </option>
+                  ))}
+                </select>
+                {errors.region && <span className="field-error">{errors.region}</span>}
+              </div>
+
+              <div className="checkout-field">
+                <label htmlFor="comuna">Comuna*</label>
+                <select id="comuna" name="comuna" value={formData.comuna} onChange={handleChange}>
+                  {comunasSugeridas.map((comuna) => (
+                    <option key={comuna} value={comuna}>
+                      {comuna}
+                    </option>
+                  ))}
+                </select>
+                {errors.comuna && <span className="field-error">{errors.comuna}</span>}
+              </div>
+            </div>
+          </section>
+        </section>
+
+        <section className="cart-summary-panel">
+          <header className="panel-header">
+            <h2>Carrito de Compras</h2>
+          </header>
+
+          <div className="cart-items-table-wrapper">
+            <table className="cart-items-table compact">
+              <thead>
+                <tr>
+                  <th>Imagen</th>
+                  <th>Nombre</th>
+                  <th>Precio</th>
+                  <th>Cantidad</th>
+                  <th>Subtotal</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                {cart.map((item) => (
+                  <tr key={item.id}>
+                    <td>
+                      <img src={item.imagen || '/favicon.svg'} alt={item.nombre} className="cart-item-image" />
+                    </td>
+                    <td>{item.nombre}</td>
+                    <td>$ {item.precio.toLocaleString()}</td>
+                    <td>
+                      <div className="qty-controls">
+                        <button type="button" onClick={() => updateCantidad(item.id, -1)}>
+                          -
+                        </button>
+                        <span>{item.cantidad}</span>
+                        <button type="button" onClick={() => updateCantidad(item.id, 1)}>
+                          +
+                        </button>
+                      </div>
+                    </td>
+                    <td>$ {(item.precio * item.cantidad).toLocaleString()}</td>
+                    <td>
+                      <button type="button" className="btn-delete-inline" onClick={() => removeFromCart(item.id)}>
+                        Eliminar
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          <div className="summary-total-row">
+            <span>Total</span>
+            <strong>$ {total.toLocaleString()}</strong>
+          </div>
+
+          <footer className="checkout-footer compact-actions">
+            <button type="button" className="btn-clear" onClick={clearCart}>
+              Limpiar
+            </button>
+            <button type="submit" className="btn-pay">
+              Comprar ahora
+            </button>
+          </footer>
+        </section>
+      </form>
+
+      {showConfirmModal && (
+        <div className="checkout-modal-overlay" role="dialog" aria-modal="true">
+          <div className="checkout-modal">
+            <h3>Confirmar datos del cliente</h3>
+            <p>Revisa la información antes de finalizar el pedido.</p>
+
+            <div className="checkout-modal-grid">
+              <div>
+                <span>Nombre</span>
+                <strong>{formData.nombre || '-'}</strong>
+              </div>
+              <div>
+                <span>Apellidos</span>
+                <strong>{formData.apellidos || '-'}</strong>
+              </div>
+              <div className="full">
+                <span>Correo</span>
+                <strong>{formData.correo || '-'}</strong>
+              </div>
+              <div className="full">
+                <span>Dirección</span>
+                <strong>
+                  {formData.calle || '-'}
+                  {formData.departamento ? `, Depto ${formData.departamento}` : ''}
+                  {formData.comuna ? `, ${formData.comuna}` : ''}
+                  {formData.region ? `, ${formData.region}` : ''}
+                </strong>
+              </div>
+            </div>
+
+            <div className="checkout-modal-actions">
+              <button type="button" className="btn-modal-secondary" onClick={() => setShowConfirmModal(false)}>
+                Editar
+              </button>
+              <button type="button" className="btn-modal-primary" onClick={confirmarPago}>
+                Finalizar pedido
+              </button>
+            </div>
           </div>
         </div>
       )}
-    </div>
+    </main>
   );
 };
 

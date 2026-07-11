@@ -1,0 +1,227 @@
+.compra-resultado-page {
+  max-width: 980px;
+  margin: 16px auto;
+  padding: 0 10px 24px;
+  color: #1f2937;
+  font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+}
+
+.compra-resultado-card {
+  background: #ffffff;
+  border: 1px solid #eaf0f6;
+  border-radius: 10px;
+  box-shadow: 0 4px 14px rgba(16, 24, 40, 0.08);
+  padding: 12px 12px 14px;
+}
+
+.compra-resultado-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 4px;
+}
+
+.compra-estado-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  font-size: 1.9rem;
+  color: #1f2937;
+  font-weight: 800;
+  line-height: 1.1;
+}
+
+.compra-estado-icon {
+  font-size: 1.1rem;
+  line-height: 1;
+}
+
+.compra-estado-icon.exito {
+  color: #1fa971;
+}
+
+.compra-estado-icon.error {
+  color: #e44747;
+}
+
+.compra-subtitle {
+  margin: 4px 0 0;
+  color: #6b7280;
+  font-size: 0.9rem;
+}
+
+.compra-order-code {
+  color: #4b5563;
+  font-size: 0.86rem;
+  margin-top: 5px;
+  white-space: nowrap;
+}
+
+.compra-retry-wrap {
+  margin: 10px 0 10px;
+  display: flex;
+  justify-content: center;
+}
+
+.btn-retry {
+  border: none;
+  border-radius: 7px;
+  background: #168a45;
+  color: #fff;
+  padding: 9px 16px;
+  font-weight: 800;
+  font-size: 0.95rem;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.btn-retry:hover {
+  background: #12723a;
+}
+
+.compra-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 10px 12px;
+  margin-top: 8px;
+}
+
+.compra-section-title {
+  grid-column: 1 / -1;
+  margin: 2px 0 0;
+  font-size: 1.55rem;
+  color: #1f2937;
+  font-weight: 800;
+}
+
+.compra-field {
+  display: flex;
+  flex-direction: column;
+}
+
+.compra-field.full {
+  grid-column: 1 / -1;
+}
+
+.compra-field label {
+  margin-bottom: 5px;
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #374151;
+}
+
+.compra-readonly {
+  border: 1px solid #e5e7eb;
+  background: #f3f7fa;
+  border-radius: 6px;
+  padding: 9px 10px;
+  font-size: 0.92rem;
+  min-height: 18px;
+  color: #1f2937;
+}
+
+.compra-table-wrapper {
+  overflow-x: auto;
+  margin-top: 12px;
+}
+
+.compra-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 700px;
+}
+
+.compra-table th,
+.compra-table td {
+  border-bottom: 1px solid #eef2f7;
+  padding: 9px 8px;
+  text-align: left;
+  font-size: 0.92rem;
+}
+
+.compra-table th {
+  font-weight: 700;
+  color: #111827;
+  font-size: 0.85rem;
+}
+
+.compra-table-img {
+  width: 36px;
+  height: 20px;
+  object-fit: cover;
+  border-radius: 3px;
+  background: #e5e7eb;
+  border: 1px solid #e5e7eb;
+}
+
+.compra-total-box {
+  margin-top: 12px;
+  background: #ffffff;
+  border: 1px solid #e8edf3;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(15, 23, 42, 0.06);
+  padding: 11px 16px;
+  text-align: center;
+  font-size: 2rem;
+  color: #111827;
+  font-weight: 800;
+  line-height: 1.1;
+}
+
+.compra-actions {
+  margin-top: 10px;
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.btn-boleta {
+  border: none;
+  border-radius: 6px;
+  padding: 7px 12px;
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.82rem;
+  cursor: pointer;
+}
+
+.btn-boleta.pdf {
+  background: #d54545;
+}
+
+.btn-boleta.email {
+  background: #168a45;
+}
+
+@media (max-width: 900px) {
+  .compra-form-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 680px) {
+  .compra-resultado-top {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .compra-form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .compra-estado-title {
+    font-size: 1.4rem;
+  }
+
+  .compra-section-title {
+    font-size: 1.2rem;
+  }
+
+  .compra-total-box {
+    font-size: 1.4rem;
+  }
+}

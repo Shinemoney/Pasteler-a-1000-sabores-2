@@ -1,4 +1,4 @@
-/* src/pages/Catalogo.css */
+tengo archivos duplicado en la carpeta principal o codigos?/* src/pages/Catalogo.css */
 
 .catalogo-grid {
   display: grid;
@@ -16,6 +16,27 @@
   border: 2px solid #FFC0CB;
   text-align: center;
   transition: transform 0.2s;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.producto-card h3 {
+  color: #5D4037;
+  margin: 6px 0;
+  line-height: 1.2;
+}
+
+.producto-card p {
+  color: #6d4c41;
+  line-height: 1.45;
+  font-size: 0.95rem;
+  margin: 0;
+  min-height: 82px;
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .producto-card img {
@@ -32,5 +53,5 @@
   padding: 10px 20px;
   border-radius: 5px;
   cursor: pointer;
-  margin-top: 10px;
+  margin-top: auto;
 }

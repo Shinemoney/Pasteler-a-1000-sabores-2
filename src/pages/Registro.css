@@ -1,0 +1,17 @@
+.registro-card {
+  background: #8B4513;
+  color: #f06fa4;
+  border: 1px solid #6f350f;
+  box-shadow: 0 8px 18px rgba(57, 25, 8, 0.34);
+  border-radius: 8px;
+}
+
+.registro-title {
+  color: #ff8aba;
+  font-family: 'Pacifico', cursive;
+}
+
+.registro-card .form-label {
+  color: #ff8aba;
+  font-weight: 600;
+}

@@ -98,8 +98,10 @@ const AdminDashboard = () => {
           onClick={handleLogout}
           aria-label="Cerrar sesión segura de administrador"
         >
-          <h3>🔒 Cerrar sesión segura</h3>
-          <p>Finaliza tu sesión de administrador.</p>
+          <div className="logout-visual">
+            <span className="power-icon" aria-hidden="true">⏻</span>
+          </div>
+          <h3>Cerrar Sesión</h3>
         </button>
       </div>
     </div>

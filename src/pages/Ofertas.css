@@ -74,7 +74,12 @@
 .oferta-descripcion {
   color: #6d4c41;
   font-size: 0.95rem;
-  min-height: 44px;
+  line-height: 1.45;
+  min-height: 84px;
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .oferta-pricing {
@@ -98,7 +103,7 @@
 }
 
 .oferta-ahorro {
-  color: #1f7a1f;
+  color: #6d4c41;
   font-weight: 700;
   margin: 0;
   font-size: 0.92rem;
@@ -123,9 +128,24 @@
   transition: opacity 0.2s, transform 0.2s;
 }
 
-.btn-agregar-oferta {
-  background: #28a745;
-  color: #fff;
+.oferta-actions .btn-agregar-oferta,
+.oferta-actions .btn-agregar-oferta.btn,
+.oferta-actions .btn-agregar-oferta.btn-success {
+  background: #ff8c00 !important;
+  border-color: #ff8c00 !important;
+  color: #fff !important;
+}
+
+.oferta-actions .btn-agregar-oferta:hover,
+.oferta-actions .btn-agregar-oferta.btn:hover,
+.oferta-actions .btn-agregar-oferta.btn-success:hover,
+.oferta-actions .btn-agregar-oferta:focus,
+.oferta-actions .btn-agregar-oferta.btn:focus,
+.oferta-actions .btn-agregar-oferta:active,
+.oferta-actions .btn-agregar-oferta.btn:active {
+  background: #e67e00 !important;
+  border-color: #e67e00 !important;
+  color: #fff !important;
 }
 
 .btn-detalle-oferta {
