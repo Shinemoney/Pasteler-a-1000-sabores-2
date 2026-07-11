@@ -47,6 +47,7 @@ const Ofertas = () => {
                 </div>
 
                 <div className="oferta-actions">
+<<<<<<< HEAD
                   <button
                     className="btn-agregar-oferta"
                     onClick={() =>
@@ -58,6 +59,9 @@ const Ofertas = () => {
                       })
                     }
                   >
+=======
+                  <button className="btn btn-agregar-oferta" onClick={() => addToCart({ ...prod, precio: precioFinal })}>
+>>>>>>> 2fa4808 (Modificar archivos)
                     Agregar al carrito
                   </button>
                   <Link to={`/producto/${prod.id}`} className="btn-detalle-oferta">

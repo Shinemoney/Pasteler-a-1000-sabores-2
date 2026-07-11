@@ -12,7 +12,6 @@ import AdminLogin from './pages/AdminLogin';
 import Registro from './pages/Registro';
 import Contacto from './pages/Contacto';
 import Cart from './pages/Cart';
-import AdminProductos from './pages/AdminProductos';
 import AdminDashboard from './pages/AdminDashboard'; // Importamos el Dashboard
 import VistaProductosPorCategoria from './pages/VistaProductosPorCategoria'; 
 import Ofertas from './pages/Ofertas'; 
@@ -23,6 +22,7 @@ import BlogDetalle from './pages/BlogDetalle';
 import DetalleProducto from './pages/DetalleProducto';
 import Catalogo from './pages/Catalogo';
 import AdminPanel from './pages/AdminPanel';
+import CompraResultado from './pages/CompraResultado';
 
 // Componente para proteger la ruta de administración
 const ProtectedRoute = ({ children }) => {
@@ -46,6 +46,7 @@ function App() {
                 <Route path="/registro" element={<Registro />} />
                 <Route path="/contacto" element={<Contacto />} />
                 <Route path="/cart" element={<Cart />} />
+                <Route path="/compra-resultado/:estado" element={<CompraResultado />} />
                 
                 {/* Ruta protegida del AdminDashboard */}
                 <Route path="/admin" element={
@@ -54,7 +55,16 @@ function App() {
                   </ProtectedRoute>
                 } />
                 
-                <Route path="/admin/productos" element={<AdminProductos />} />
+                <Route path="/admin/productos" element={
+                  <ProtectedRoute>
+                    <AdminPanel />
+                  </ProtectedRoute>
+                } />
+                <Route path="/admin/productos/:seccion" element={
+                  <ProtectedRoute>
+                    <AdminPanel />
+                  </ProtectedRoute>
+                } />
                 <Route path="/categoria/:nombreCategoria" element={<VistaProductosPorCategoria />} />
                 <Route path="/ofertas" element={<Ofertas />} />
                 <Route path="/categorias" element={<Categorias />} />

@@ -7,6 +7,7 @@ const STOCK_STORAGE_KEY = 'admin_productos';
 
 const AdminPanel = () => {
   const { seccion } = useParams();
+  const seccionActiva = seccion || 'productos';
 
   const [usuarios, setUsuarios] = useState([
     { id: 1, nombre: 'María González', email: 'maria@1000sabores.cl', rol: 'Administrador', estado: 'activo' },
@@ -132,24 +133,47 @@ const AdminPanel = () => {
   const agregarProducto = () => {
     const precio = Number(nuevoProducto.precio);
     const stock = Number(nuevoProducto.stock);
-    if (!nuevoProducto.nombre.trim() || Number.isNaN(precio) || Number.isNaN(stock)) return;
+    const nombre = nuevoProducto.nombre.trim();
+
+    if (!nombre) {
+      alert('Debes ingresar el nombre del producto.');
+      return;
+    }
+    if (Number.isNaN(precio) || precio < 0) {
+      alert('El precio debe ser un número válido mayor o igual a 0.');
+      return;
+    }
+    if (Number.isNaN(stock) || stock < 0) {
+      alert('El stock debe ser un número válido mayor o igual a 0.');
+      return;
+    }
 
     setProductos((prev) => [
       ...prev,
       {
         id: Date.now(),
-        nombre: nuevoProducto.nombre.trim(),
-        categoria: nuevoProducto.categoria,
+        nombre,
+        categoria: nuevoProducto.categoria || categorias[0]?.nombre || 'General',
         precio,
         stock,
       },
     ]);
     setNuevoProducto({ nombre: '', categoria: categorias[0]?.nombre || 'Tortas', precio: '', stock: '' });
+    alert('Producto agregado correctamente.');
   };
 
   const editarProducto = (id) => {
-    const nuevoStock = Number(window.prompt('Nuevo stock'));
-    if (Number.isNaN(nuevoStock)) return;
+    const producto = productos.find((p) => p.id === id);
+    const stockActual = producto ? Number(producto.stock || 0) : 0;
+    const input = window.prompt('Nuevo stock', String(stockActual));
+    if (input === null) return;
+
+    const nuevoStock = Number(input);
+    if (Number.isNaN(nuevoStock) || nuevoStock < 0) {
+      alert('El stock debe ser un número válido mayor o igual a 0.');
+      return;
+    }
+
     setProductos((prev) => prev.map((p) => (p.id === id ? { ...p, stock: nuevoStock } : p)));
   };
 
@@ -511,7 +535,7 @@ const AdminPanel = () => {
   );
 
   const renderContenido = () => {
-    switch (seccion) {
+    switch (seccionActiva) {
       case 'usuarios':
         return renderUsuarios();
       case 'reportes':

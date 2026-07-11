@@ -66,6 +66,7 @@
   transform: scale(1.05); 
 }
 
+<<<<<<< HEAD
 .btn-cart {
   background: linear-gradient(135deg, #ff8a00, #ff6a00);
   color: white;
@@ -85,3 +86,41 @@
 }
 
 .btn-login { margin-right: 10px; }
+=======
+.btn-cart { 
+  background-color: #ff8c00; 
+  color: white; 
+  padding: 5px 15px; 
+  border-radius: 5px; 
+  text-decoration: none; 
+}
+
+.auth-buttons {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.search-bar button {
+  border: 2px solid #5d2f0f;
+}
+
+.btn-login,
+.btn-register {
+  background-color: #8B4513;
+  color: #f06fa4;
+  border: 2px solid #5d2f0f;
+  border-radius: 4px;
+  padding: 4px 10px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
+}
+
+.btn-login:hover,
+.btn-register:hover {
+  background-color: #7a3d12;
+  color: #ff8aba;
+  transform: translateY(-1px);
+}
+>>>>>>> 2fa4808 (Modificar archivos)

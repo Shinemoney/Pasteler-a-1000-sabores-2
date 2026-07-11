@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import Slider from '../components/Slider';
 import './Home.css';
 
 const Home = () => {
@@ -20,12 +21,15 @@ const Home = () => {
           </button>
 
           <button className="home-card-accion card-admin" onClick={() => navigate('/admin-login')}>
-            Acces admin
+             Admin
           </button>
         </aside>
 
-        {/* Área principal vacía para mantener estructura */}
-        <section className="home-main-placeholder" />
+        <section className="home-main-placeholder">
+          <div className="home-slider-center">
+            <Slider />
+          </div>
+        </section>
       </div>
 
       {/* Modal de Horario */}

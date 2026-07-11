@@ -109,3 +109,26 @@ code {
   padding: 4px 8px;
   background: var(--code-bg);
 }
+
+/* Override global para botón "Agregar al carrito" en Ofertas */
+.oferta-actions .btn.btn-agregar-oferta,
+.oferta-actions .btn-agregar-oferta,
+.oferta-actions button.btn-agregar-oferta {
+  background-color: #ff8c00 !important;
+  border-color: #ff8c00 !important;
+  color: #fff !important;
+}
+
+.oferta-actions .btn.btn-agregar-oferta:hover,
+.oferta-actions .btn-agregar-oferta:hover,
+.oferta-actions button.btn-agregar-oferta:hover,
+.oferta-actions .btn.btn-agregar-oferta:focus,
+.oferta-actions .btn-agregar-oferta:focus,
+.oferta-actions button.btn-agregar-oferta:focus,
+.oferta-actions .btn.btn-agregar-oferta:active,
+.oferta-actions .btn-agregar-oferta:active,
+.oferta-actions button.btn-agregar-oferta:active {
+  background-color: #e67e00 !important;
+  border-color: #e67e00 !important;
+  color: #fff !important;
+}

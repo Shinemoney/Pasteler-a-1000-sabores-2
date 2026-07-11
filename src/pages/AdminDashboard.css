@@ -7,8 +7,26 @@
 }
 
 .admin-container h1 {
-  margin-bottom: 25px;
-  color: #333;
+  margin: 0 0 30px;
+  color: #5a3421;
+  font-size: clamp(1.8rem, 3.2vw, 2.7rem);
+  font-weight: 800;
+  letter-spacing: 0.2px;
+  line-height: 1.15;
+  position: relative;
+  display: inline-block;
+  padding-bottom: 12px;
+}
+
+.admin-container h1::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 65%;
+  height: 4px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #f7a8c4 0%, #ffc0cb 60%, rgba(255, 192, 203, 0) 100%);
 }
 
 /* --- Grillas --- */
@@ -66,13 +84,13 @@
 /* --- Estilos de tarjetas de navegación (Inferiores) --- */
 
 .nav-card {
-  background: white;
+  background: #fff8f1;
   padding: 20px;
   border-radius: 12px;
-  border: 1px solid #dee2e6;
+  border: 1.5px solid #f4a8c3;
   text-align: center;
   text-decoration: none; /* Elimina el subrayado de los links */
-  color: #333;
+  color: #a94f79;
   display: block;
   transition: all 0.3s ease; /* Transición suave para el hover */
   cursor: pointer;
@@ -81,53 +99,81 @@
 }
 
 .nav-card-logout {
-  background: linear-gradient(135deg, #fff5f5 0%, #ffe3e3 100%);
-  border: 1px solid #f1aeb5;
-  box-shadow: 0 6px 16px rgba(220, 53, 69, 0.12);
-  padding: 14px 16px;
+  background: linear-gradient(145deg, #e65157 0%, #b80000 75%);
+  border: 1.5px solid #f4a8c3;
+  box-shadow: 0 8px 18px rgba(134, 13, 20, 0.24);
+  padding: 8px 10px 10px;
+  color: #fff;
+}
+
+.logout-visual {
+  width: 100%;
+  min-height: 74px;
+  border-radius: 10px;
+  background: radial-gradient(circle at 35% 25%, rgba(255,255,255,0.18), rgba(255,255,255,0) 46%),
+              linear-gradient(150deg, #d00000 0%, #a00000 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 6px;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.14);
+}
+
+.power-icon {
+  font-size: clamp(2rem, 4vw, 2.8rem);
+  line-height: 1;
+  color: #ffffff;
+  text-shadow: 0 5px 12px rgba(0, 0, 0, 0.26);
 }
 
 .nav-card-logout h3 {
-  color: #842029;
-  font-weight: 800;
+  color: #fff;
+  font-weight: 900;
   letter-spacing: 0.2px;
-  font-size: 1.05rem;
-  margin-bottom: 6px;
+  font-size: 0.98rem;
+  margin-bottom: 4px;
 }
 
 .nav-card-logout p {
-  color: #9a2a35;
-  font-weight: 500;
-  font-size: 0.8rem;
+  color: #ffe7ea;
+  font-weight: 600;
+  font-size: 0.72rem;
 }
 
 .nav-card-logout:hover {
   transform: translateY(-8px);
-  border-color: #dc3545;
-  box-shadow: 0 14px 24px rgba(220, 53, 69, 0.2);
-  background: linear-gradient(135deg, #ffe9ec 0%, #ffd7dd 100%);
+  border-color: #ffc0cb;
+  box-shadow: 0 16px 28px rgba(134, 13, 20, 0.34);
+  background: linear-gradient(145deg, #ee5f66 0%, #be0000 75%);
 }
 
 .nav-card-logout:focus-visible {
-  outline: 3px solid #dc3545;
+  outline: 3px solid #ffc0cb;
   outline-offset: 2px;
 }
 
 .nav-card:hover {
   transform: translateY(-8px); /* Efecto de elevación al pasar el mouse */
-  box-shadow: 0 10px 20px rgba(0,0,0,0.15);
-  border-color: #0d6efd;
+  box-shadow: 0 10px 22px rgba(143, 73, 103, 0.18);
+  border-color: #ec86ae;
+  background: #fff2e8;
+}
+
+.nav-card:focus-visible {
+  outline: 3px solid #ec86ae;
+  outline-offset: 2px;
 }
 
 .nav-card h3 {
   margin-top: 0;
   margin-bottom: 10px;
   font-size: 1.2rem;
+  color: #9f3f6e;
 }
 
 .nav-card p {
   font-size: 0.85rem;
-  color: #666;
+  color: #a85780;
   margin: 0;
 }
 
