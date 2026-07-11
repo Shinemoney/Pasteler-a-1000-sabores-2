@@ -74,7 +74,12 @@
 .oferta-descripcion {
   color: #6d4c41;
   font-size: 0.95rem;
-  min-height: 44px;
+  line-height: 1.45;
+  min-height: 84px;
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .oferta-pricing {

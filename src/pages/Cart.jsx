@@ -1,13 +1,8 @@
-import React, { useContext, useMemo, useState } from 'react';
+import React, { useContext, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { CartContext } from '../context/CartContext';
+import { AuthContext } from '../context/AuthContext';
 import './CartCheckout.css';
-
-const estadoLabel = {
-  preparacion: 'En preparación',
-  despacho: 'En despacho',
-  entrega: 'Entregado',
-};
 
 const regionesChile = [
   'Región de Arica y Parinacota',
@@ -65,32 +60,36 @@ const comunasSugeridas = [
 
 const Cart = () => {
   const navigate = useNavigate();
-
-  const {
-    cart,
-    resumen,
-    pedidoActual,
-    removeFromCart,
-    updateCantidad,
-    confirmarPedido,
-    avanzarEstadoPedido,
-    limpiarPedidoActual,
-  } = useContext(CartContext);
+  const { cart, resumen, removeFromCart, updateCantidad, confirmarPedido } = useContext(CartContext);
+  const { currentUser, isAdmin } = useContext(AuthContext);
 
   const [formData, setFormData] = useState({
     nombre: '',
     apellidos: '',
     correo: '',
     calle: '',
-    departamento: '',
+    departamento: '603',
     region: 'Región Metropolitana de Santiago',
     comuna: 'Cerrillos',
     indicaciones: '',
+    fechaEntregaPreferida: '',
   });
 
   const [errors, setErrors] = useState({});
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
 
   const total = useMemo(() => (resumen?.total ? resumen.total : 0), [resumen]);
+
+  useEffect(() => {
+    if (!currentUser || isAdmin) return;
+
+    setFormData((prev) => ({
+      ...prev,
+      nombre: prev.nombre || currentUser.nombre || '',
+      apellidos: prev.apellidos || currentUser.apellidos || '',
+      correo: prev.correo || currentUser.correo || currentUser.email || '',
+    }));
+  }, [currentUser, isAdmin]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -118,31 +117,39 @@ const Cart = () => {
     return Object.keys(nuevosErrores).length === 0;
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-
-    if (!cart?.length) return;
-    if (!validar()) return;
-
-    const fechaDefault = new Date();
-    fechaDefault.setDate(fechaDefault.getDate() + 1);
-
+  const confirmarPago = () => {
+    const fechaEntrega = formData.fechaEntregaPreferida || new Date().toISOString().split('T')[0];
     const direccionCompleta = `${formData.calle}${formData.departamento ? `, Depto ${formData.departamento}` : ''}, ${formData.comuna}, ${formData.region}`;
 
     const resultado = confirmarPedido({
-      fechaEntrega: fechaDefault.toISOString().split('T')[0],
+      fechaEntrega,
       direccionEntrega: direccionCompleta,
       cliente: {
         nombre: formData.nombre,
         apellidos: formData.apellidos,
         correo: formData.correo,
       },
+      direccionDetalle: {
+        calle: formData.calle,
+        departamento: formData.departamento,
+        region: formData.region,
+        comuna: formData.comuna,
+        indicaciones: formData.indicaciones,
+      },
       notasEntrega: formData.indicaciones,
     });
 
     if (resultado?.ok) {
+      setShowConfirmModal(false);
       navigate('/compra-resultado/exito');
     }
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (!cart?.length) return;
+    if (!validar()) return;
+    setShowConfirmModal(true);
   };
 
   if (!cart.length) {
@@ -157,87 +164,16 @@ const Cart = () => {
   }
 
   return (
-<<<<<<< HEAD
-    <div className="cart-container" style={{ padding: '20px', maxWidth: '900px', margin: 'auto' }}>
-      <h1>Tu Carrito</h1>
-
-      {cart.length === 0 ? (
-        <p style={{ textAlign: 'center', marginTop: '20px' }}>Tu carrito está vacío</p>
-      ) : (
-        <>
-          {cart.map((item) => (
-            <div
-              key={item.id}
-              className="cart-item"
-              style={{
-                borderBottom: '1px solid #ccc',
-                padding: '10px 0',
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-              }}
-            >
-              <div>
-                <h3>{item.nombre}</h3>
-                {item.descuentoPct > 0 ? (
-                  <>
-                    <p style={{ margin: 0 }}>
-                      <span style={{ textDecoration: 'line-through', color: '#777' }}>
-                        ${item.precioOriginal.toLocaleString()} CLP
-                      </span>{' '}
-                      <span style={{ color: '#b12704', fontWeight: 700 }}>-{item.descuentoPct}%</span>
-                    </p>
-                    <p style={{ margin: '2px 0 0 0', fontWeight: 700 }}>
-                      ${item.precio.toLocaleString()} CLP
-                    </p>
-                  </>
-                ) : (
-                  <p>${item.precio.toLocaleString()} CLP</p>
-                )}
-                <small>Subtotal: ${(item.precio * item.cantidad).toLocaleString()} CLP</small>
-              </div>
-              <div className="cart-controls">
-                <button onClick={() => updateCantidad(item.id, -1)}>-</button>
-                <span style={{ margin: '0 10px' }}>{item.cantidad}</span>
-                <button onClick={() => updateCantidad(item.id, 1)}>+</button>
-                <button onClick={() => removeFromCart(item.id)} style={{ marginLeft: '15px', color: 'red' }}>
-                  🗑️
-                </button>
-              </div>
-            </div>
-          ))}
-
-          <div style={{ marginTop: '20px', textAlign: 'right' }}>
-            <p>Productos: {resumen.cantidadTotal}</p>
-            <p>Subtotal: ${resumen.subtotal.toLocaleString()} CLP</p>
-            <p>Ahorro total: -${resumen.ahorroTotal.toLocaleString()} CLP</p>
-            <p>Despacho: ${resumen.despacho.toLocaleString()} CLP</p>
-            <h2>Total: ${resumen.total.toLocaleString()} CLP</h2>
-            <button
-              onClick={finalizarDirecto}
-              style={{
-                backgroundColor: '#8b4513',
-                color: 'white',
-                padding: '12px 24px',
-                border: 'none',
-                cursor: 'pointer',
-                fontSize: '1rem',
-              }}
-            >
-              Confirmar Pedido
-            </button>
-=======
     <main className="cart-checkout-page">
       <form className="cart-checkout-card" onSubmit={handleSubmit}>
         <header className="cart-checkout-header">
           <div>
             <h1>Carrito de compra</h1>
             <p>Completa la siguiente información</p>
->>>>>>> 2fa4808 (Modificar archivos)
           </div>
           <div className="cart-total-badge">
             <span>Total a pagar:</span>
-            <strong>${total.toLocaleString()}</strong>
+            <strong>$ {total.toLocaleString()}</strong>
           </div>
         </header>
 
@@ -257,10 +193,10 @@ const Cart = () => {
               {cart.map((item) => (
                 <tr key={item.id}>
                   <td>
-                    <img src={item.imagen} alt={item.nombre} className="cart-item-image" />
+                    <img src={item.imagen || '/favicon.svg'} alt={item.nombre} className="cart-item-image" />
                   </td>
                   <td>{item.nombre}</td>
-                  <td>${item.precio.toLocaleString()}</td>
+                  <td>$ {item.precio.toLocaleString()}</td>
                   <td>
                     <div className="qty-controls">
                       <button type="button" onClick={() => updateCantidad(item.id, -1)}>
@@ -272,7 +208,7 @@ const Cart = () => {
                       </button>
                     </div>
                   </td>
-                  <td>${(item.precio * item.cantidad).toLocaleString()}</td>
+                  <td>$ {(item.precio * item.cantidad).toLocaleString()}</td>
                   <td>
                     <button type="button" className="btn-delete-inline" onClick={() => removeFromCart(item.id)}>
                       Eliminar
@@ -322,13 +258,7 @@ const Cart = () => {
 
             <div className="checkout-field">
               <label htmlFor="departamento">Departamento (opcional)</label>
-              <input
-                id="departamento"
-                name="departamento"
-                placeholder="Ej: 603"
-                value={formData.departamento}
-                onChange={handleChange}
-              />
+              <input id="departamento" name="departamento" value={formData.departamento} onChange={handleChange} />
             </div>
 
             <div className="checkout-field">
@@ -368,40 +298,53 @@ const Cart = () => {
           </div>
         </section>
 
-        <footer className="checkout-footer" style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+        <footer className="checkout-footer">
           <button type="submit" className="btn-pay">
-            Pagar ahora ${total.toLocaleString()}
-          </button>
-          <button type="button" className="btn-pay" onClick={() => navigate('/compra-resultado/error')}>
-            Simular pago fallido
+            Pagar ahora $ {total.toLocaleString()}
           </button>
         </footer>
       </form>
 
-      {pedidoActual && (
-        <section className="cart-checkout-card checkout-section" style={{ marginTop: '16px' }}>
-          <h2>Seguimiento del pedido</h2>
-          <p>
-            <strong>ID Pedido:</strong> {pedidoActual.id}
-          </p>
-          <p>
-            <strong>Estado:</strong> {estadoLabel[pedidoActual.estado] || pedidoActual.estado}
-          </p>
-          <p>
-            <strong>Código de seguimiento:</strong> {pedidoActual.tracking.codigo}
-          </p>
-          <p>
-            <strong>Fecha entrega preferida:</strong> {pedidoActual.boleta.fechaEntregaPreferida}
-          </p>
-          <div style={{ marginTop: '12px', display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
-            <button type="button" className="btn-pay" onClick={avanzarEstadoPedido}>
-              Actualizar estado
-            </button>
-            <button type="button" className="btn-pay" onClick={limpiarPedidoActual}>
-              Limpiar seguimiento
-            </button>
+      {showConfirmModal && (
+        <div className="checkout-modal-overlay" role="dialog" aria-modal="true">
+          <div className="checkout-modal">
+            <h3>Confirmar datos del cliente</h3>
+            <p>Revisa la información antes de finalizar el pedido.</p>
+
+            <div className="checkout-modal-grid">
+              <div>
+                <span>Nombre</span>
+                <strong>{formData.nombre || '-'}</strong>
+              </div>
+              <div>
+                <span>Apellidos</span>
+                <strong>{formData.apellidos || '-'}</strong>
+              </div>
+              <div className="full">
+                <span>Correo</span>
+                <strong>{formData.correo || '-'}</strong>
+              </div>
+              <div className="full">
+                <span>Dirección</span>
+                <strong>
+                  {formData.calle || '-'}
+                  {formData.departamento ? `, Depto ${formData.departamento}` : ''}
+                  {formData.comuna ? `, ${formData.comuna}` : ''}
+                  {formData.region ? `, ${formData.region}` : ''}
+                </strong>
+              </div>
+            </div>
+
+            <div className="checkout-modal-actions">
+              <button type="button" className="btn-modal-secondary" onClick={() => setShowConfirmModal(false)}>
+                Editar
+              </button>
+              <button type="button" className="btn-modal-primary" onClick={confirmarPago}>
+                Finalizar pedido
+              </button>
+            </div>
           </div>
-        </section>
+        </div>
       )}
     </main>
   );

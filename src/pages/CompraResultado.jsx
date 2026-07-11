@@ -28,21 +28,25 @@ const CompraResultado = () => {
     const despacho = boleta?.despacho ?? 0;
     const total = boleta?.total ?? subtotal + despacho;
 
+    const clienteBase = pedidoActual?.cliente || {
+      nombre: 'pedro',
+      apellidos: 'hacker',
+      correo: 'pedro.hazer20@example.com',
+    };
+
+    const direccionBase = pedidoActual?.direccionDetalle || {
+      calle: 'Los crisantemos, Edificio Norte',
+      departamento: 'Depto 603',
+      region: 'Región Metropolitana de Santiago',
+      comuna: 'Cerrillos',
+      indicaciones: 'El martes estaremos en el depto, pero puede dejarlo con el conserje.',
+    };
+
     return {
       orderNumber: pedidoActual?.id?.replace('PED-', '') || '2024705',
       orderCode: pedidoActual?.id || 'ORDER12345',
-      cliente: {
-        nombre: 'pedro',
-        apellidos: 'hacker',
-        correo: 'pedro.hazer20@example.com',
-      },
-      direccion: {
-        calle: boleta?.direccionEntrega?.split(',')?.[0]?.trim() || 'Los crisantemos, Edificio Norte',
-        departamento: 'Depto 603',
-        region: 'Región Metropolitana de Santiago',
-        comuna: 'Cerrillos',
-        indicaciones: 'El martes estaremos en el depto, pero puede dejarlo con el conserje.',
-      },
+      cliente: clienteBase,
+      direccion: direccionBase,
       items,
       total,
     };
@@ -60,9 +64,11 @@ const CompraResultado = () => {
           <div>
             <h1 className="compra-estado-title">
               <span className={`compra-estado-icon ${esExito ? 'exito' : 'error'}`}>{esExito ? '✅' : '❌'}</span>
-              {esExito ? `Se ha realizado la compra. nro #${viewData.orderNumber}` : `No se pudo realizar el pago. nro #${viewData.orderNumber}`}
+              {esExito
+                ? `Se ha realizado la compra. nro #${viewData.orderNumber}`
+                : `No se pudo realizar el pago. nro #${viewData.orderNumber}`}
             </h1>
-            <p className="compra-subtitle">{esExito ? 'Completa la siguiente información' : 'Detalle de compra'}</p>
+            <p className="compra-subtitle">{esExito ? 'Completa la siguiente información' : 'Detalle de comprar'}</p>
           </div>
 
           {esExito && <div className="compra-order-code">Código orden: {viewData.orderCode}</div>}
@@ -149,7 +155,7 @@ const CompraResultado = () => {
               Imprimir boleta en PDF
             </button>
             <button type="button" className="btn-boleta email">
-              Envíar boleta por email
+              Enviar boleta por email
             </button>
           </div>
         )}

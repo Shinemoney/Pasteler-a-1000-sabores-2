@@ -1,15 +1,15 @@
 /* src/components/Navbar.css */
-.navbar-container { 
-  background-color: #FFF5E1; 
-  padding: 10px 20px; /* Padding horizontal para separar de los bordes */
-  border-bottom: 2px solid #FFC0CB; 
+.navbar-container {
+  background-color: #fff5e1;
+  padding: 10px 20px;
+  border-bottom: 2px solid #ffc0cb;
 }
 
-.top-bar { 
-  display: flex; 
-  justify-content: space-between; /* Distribuye elementos a los extremos */
-  align-items: center; 
-  margin-bottom: 15px; 
+.top-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
 }
 
 .brand-container {
@@ -19,42 +19,46 @@
 }
 
 .logo-img {
-  width: 40px; 
-  height: 40px; 
-  border-radius: 50%; 
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
   object-fit: cover;
 }
 
 .brand-name {
   font-weight: bold;
-  color: #5D4037;
+  color: #5d4037;
 }
 
-.search-bar { 
-  display: flex; 
-  align-items: center; 
+.search-bar {
+  display: flex;
+  align-items: center;
   gap: 5px;
 }
 
-.nav-menu { 
-  display: flex; 
-  justify-content: center; 
-  align-items: center; 
-  gap: 30px; 
+.search-bar button {
+  border: 2px solid #5d2f0f;
 }
 
-.menu-links { 
-  display: flex; 
-  list-style: none; 
-  gap: 15px; 
-  margin: 0; 
+.nav-menu {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 30px;
 }
 
-.menu-links a { 
-  text-decoration: none; 
-  color: #5D4037; 
+.menu-links {
+  display: flex;
+  list-style: none;
+  gap: 15px;
+  margin: 0;
+}
+
+.menu-links a {
+  text-decoration: none;
+  color: #5d4037;
   font-weight: bold;
-  background-color: #FFC0CB; 
+  background-color: #ffc0cb;
   padding: 8px 15px;
   border-radius: 8px;
   border: 1px solid #ff9aa2;
@@ -62,14 +66,13 @@
 }
 
 .menu-links a:hover {
-  background-color: #ffb3ba; 
-  transform: scale(1.05); 
+  background-color: #ffb3ba;
+  transform: scale(1.05);
 }
 
-<<<<<<< HEAD
 .btn-cart {
   background: linear-gradient(135deg, #ff8a00, #ff6a00);
-  color: white;
+  color: #fff;
   padding: 8px 16px;
   border-radius: 999px;
   border: none;
@@ -85,29 +88,15 @@
   box-shadow: 0 10px 20px rgba(255, 122, 0, 0.35);
 }
 
-.btn-login { margin-right: 10px; }
-=======
-.btn-cart { 
-  background-color: #ff8c00; 
-  color: white; 
-  padding: 5px 15px; 
-  border-radius: 5px; 
-  text-decoration: none; 
-}
-
 .auth-buttons {
   display: flex;
   align-items: center;
   gap: 10px;
 }
 
-.search-bar button {
-  border: 2px solid #5d2f0f;
-}
-
 .btn-login,
 .btn-register {
-  background-color: #8B4513;
+  background-color: #8b4513;
   color: #f06fa4;
   border: 2px solid #5d2f0f;
   border-radius: 4px;
@@ -123,4 +112,3 @@
   color: #ff8aba;
   transform: translateY(-1px);
 }
->>>>>>> 2fa4808 (Modificar archivos)
