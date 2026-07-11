@@ -17,6 +17,12 @@ export const CartProvider = ({ children }) => {
     return savedPedido ? JSON.parse(savedPedido) : null;
   });
 
+  // Borrador de checkout para conservar datos en reintentos
+  const [checkoutDraft, setCheckoutDraft] = useState(() => {
+    const savedDraft = localStorage.getItem('checkoutDraft');
+    return savedDraft ? JSON.parse(savedDraft) : null;
+  });
+
   // Persistencia
   useEffect(() => {
     localStorage.setItem('cart', JSON.stringify(cart));
@@ -29,6 +35,14 @@ export const CartProvider = ({ children }) => {
       localStorage.removeItem('pedidoActual');
     }
   }, [pedidoActual]);
+
+  useEffect(() => {
+    if (checkoutDraft) {
+      localStorage.setItem('checkoutDraft', JSON.stringify(checkoutDraft));
+    } else {
+      localStorage.removeItem('checkoutDraft');
+    }
+  }, [checkoutDraft]);
 
   // Resumen de carrito
   const resumen = useMemo(() => {
@@ -104,6 +118,9 @@ export const CartProvider = ({ children }) => {
     );
   };
 
+  // Carrito: limpiar
+  const clearCart = () => setCart([]);
+
   // Crear boleta local
   const generarBoleta = ({ fechaEntrega, direccionEntrega }) => {
     return {
@@ -128,26 +145,37 @@ export const CartProvider = ({ children }) => {
   };
 
   // Confirmación de pedido y creación de tracking
-  const confirmarPedido = ({ fechaEntrega, direccionEntrega }) => {
+  const confirmarPedido = ({
+    fechaEntrega,
+    direccionEntrega,
+    cliente = null,
+    direccionDetalle = null,
+    notasEntrega = '',
+    limpiarCarrito = true,
+  }) => {
     if (!cart.length) return { ok: false, message: 'El carrito está vacío' };
     if (!fechaEntrega) return { ok: false, message: 'Debes seleccionar una fecha de entrega' };
 
     const boleta = generarBoleta({ fechaEntrega, direccionEntrega });
     const codigoSeguimiento = `TRK-${Math.random().toString(36).slice(2, 8).toUpperCase()}`;
+    const nowIso = new Date().toISOString();
 
     const nuevoPedido = {
       id: `PED-${Date.now()}`,
-      creadoEn: new Date().toISOString(),
+      creadoEn: nowIso,
       estadoIndex: 0,
       estado: ESTADOS_PEDIDO[0],
       estadosDisponibles: ESTADOS_PEDIDO,
+      cliente,
+      direccionDetalle,
+      notasEntrega,
       tracking: {
         codigo: codigoSeguimiento,
-        actualizadoEn: new Date().toISOString(),
+        actualizadoEn: nowIso,
         historial: [
           {
             estado: ESTADOS_PEDIDO[0],
-            timestamp: new Date().toISOString(),
+            timestamp: nowIso,
             descripcion: 'Pedido confirmado, iniciando preparación',
           },
         ],
@@ -156,7 +184,10 @@ export const CartProvider = ({ children }) => {
     };
 
     setPedidoActual(nuevoPedido);
-    setCart([]);
+    if (limpiarCarrito) {
+      setCart([]);
+      setCheckoutDraft(null);
+    }
 
     return { ok: true, pedido: nuevoPedido };
   };
@@ -174,18 +205,25 @@ export const CartProvider = ({ children }) => {
         entrega: 'Pedido entregado exitosamente',
       };
 
+      const ultimoTimestamp = prev.tracking?.historial?.length
+        ? new Date(prev.tracking.historial[prev.tracking.historial.length - 1].timestamp).getTime()
+        : Date.now();
+
+      const now = Date.now();
+      const timestampSeguro = new Date(Math.max(now, ultimoTimestamp + 60000)).toISOString();
+
       return {
         ...prev,
         estadoIndex: siguienteIndex,
         estado: siguienteEstado,
         tracking: {
           ...prev.tracking,
-          actualizadoEn: new Date().toISOString(),
+          actualizadoEn: timestampSeguro,
           historial: [
             ...prev.tracking.historial,
             {
               estado: siguienteEstado,
-              timestamp: new Date().toISOString(),
+              timestamp: timestampSeguro,
               descripcion: descripcionPorEstado[siguienteEstado] || 'Actualización de estado',
             },
           ],
@@ -216,6 +254,9 @@ export const CartProvider = ({ children }) => {
     }
   };
 
+  const guardarCheckoutDraft = (draft) => setCheckoutDraft(draft);
+  const limpiarCheckoutDraft = () => setCheckoutDraft(null);
+
   const limpiarPedidoActual = () => setPedidoActual(null);
 
   return (
@@ -224,11 +265,15 @@ export const CartProvider = ({ children }) => {
         cart,
         resumen,
         pedidoActual,
+        checkoutDraft,
         addToCart,
         removeFromCart,
         updateCantidad,
         setCantidad,
+        clearCart,
         confirmarPedido,
+        guardarCheckoutDraft,
+        limpiarCheckoutDraft,
         avanzarEstadoPedido,
         limpiarPedidoActual,
         finalizarPedido,

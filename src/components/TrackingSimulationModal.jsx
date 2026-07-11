@@ -7,6 +7,17 @@ const estadoLabel = {
   entrega: 'Entregado',
 };
 
+const formatTrackingDate = (timestamp) =>
+  new Date(timestamp).toLocaleString('es-CL', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: false,
+  });
+
 const TrackingSimulationModal = ({ isOpen, pedidoActual, onClose, onUpdateEstado }) => {
   if (!isOpen || !pedidoActual) return null;
 
@@ -46,7 +57,7 @@ const TrackingSimulationModal = ({ isOpen, pedidoActual, onClose, onUpdateEstado
             historial.map((h, idx) => (
               <div key={`${h.timestamp}-${idx}`} className="tracking-history-item">
                 <strong>{estadoLabel[h.estado] || h.estado}</strong>
-                <span>{new Date(h.timestamp).toLocaleString()}</span>
+                <span>{formatTrackingDate(h.timestamp)}</span>
                 <small>{h.descripcion}</small>
               </div>
             ))

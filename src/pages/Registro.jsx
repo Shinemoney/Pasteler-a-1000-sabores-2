@@ -15,35 +15,40 @@ const fieldLabels = {
   direccion: 'Dirección',
 };
 
-const Registro = () => {
-  const [successMessage, setSuccessMessage] = useState('');
+const initialFormState = {
+  nombre: '',
+  apellido: '',
+  fechaNacimiento: '',
+  email: '',
+  password: '',
+  emailDuoc: '',
+  codigoDescuento: '',
+  region: '',
+  comuna: '',
+  direccion: '',
+};
 
-  const { values, errors, handleChange, validate } = useFormValidation(
-    {
-      nombre: '',
-      apellido: '',
-      fechaNacimiento: '',
-      email: '',
-      password: '',
-      emailDuoc: '',
-      codigoDescuento: '',
-      region: '',
-      comuna: '',
-      direccion: '',
-    },
+const Registro = () => {
+  const [feedbackMessage, setFeedbackMessage] = useState('');
+  const [feedbackType, setFeedbackType] = useState('');
+
+  const { values, errors, handleChange, validate, setValues } = useFormValidation(
+    initialFormState,
     fieldLabels
   );
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    setSuccessMessage('');
+    setFeedbackMessage('');
+    setFeedbackType('');
 
     if (validate()) {
       const registeredUsers = JSON.parse(localStorage.getItem('registeredUsers') || '[]');
       const exists = registeredUsers.some((u) => u.email.toLowerCase() === values.email.toLowerCase());
 
       if (exists) {
-        setSuccessMessage('Este correo ya está registrado.');
+        setFeedbackMessage('Este correo ya está registrado.');
+        setFeedbackType('error');
         return;
       }
 
@@ -55,7 +60,9 @@ const Registro = () => {
       };
 
       localStorage.setItem('registeredUsers', JSON.stringify([...registeredUsers, newUser]));
-      setSuccessMessage('Registro completado con éxito.');
+      setFeedbackMessage('Registro completado con éxito.');
+      setFeedbackType('success');
+      setValues(initialFormState);
     }
   };
 
@@ -91,9 +98,12 @@ const Registro = () => {
       <form onSubmit={handleSubmit} className="card p-4 shadow-sm" style={{ maxWidth: '600px', margin: 'auto' }}>
         <h2 style={{ color: '#5D4037', fontFamily: 'Pacifico, cursive' }}>Registro</h2>
 
-        {successMessage && (
-          <div className="alert alert-success py-2 mt-2" role="alert">
-            {successMessage}
+        {feedbackMessage && (
+          <div
+            className={`alert py-2 mt-2 ${feedbackType === 'error' ? 'alert-danger' : 'alert-success'}`}
+            role="alert"
+          >
+            {feedbackMessage}
           </div>
         )}
 

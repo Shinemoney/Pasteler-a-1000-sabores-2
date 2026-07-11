@@ -60,7 +60,7 @@ const comunasSugeridas = [
 
 const Cart = () => {
   const navigate = useNavigate();
-  const { cart, resumen, removeFromCart, updateCantidad, confirmarPedido } = useContext(CartContext);
+  const { cart, resumen, removeFromCart, updateCantidad, confirmarPedido, clearCart } = useContext(CartContext);
   const { currentUser, isAdmin } = useContext(AuthContext);
 
   const [formData, setFormData] = useState({
@@ -165,144 +165,144 @@ const Cart = () => {
 
   return (
     <main className="cart-checkout-page">
-      <form className="cart-checkout-card" onSubmit={handleSubmit}>
-        <header className="cart-checkout-header">
-          <div>
-            <h1>Carrito de compra</h1>
-            <p>Completa la siguiente información</p>
+      <form className="cart-compact-layout" onSubmit={handleSubmit}>
+        <section className="cart-products-panel">
+          <header className="panel-header">
+            <h2>Lista de productos</h2>
+            <p>Agrega más productos desde el catálogo para completar tu compra.</p>
+          </header>
+
+          <div className="cart-products-grid">
+            {cart.map((item) => (
+              <article key={`mini-${item.id}`} className="product-mini-card">
+                <img src={item.imagen || '/favicon.svg'} alt={item.nombre} className="product-mini-image" />
+                <h3>{item.nombre}</h3>
+                <p>$ {item.precio.toLocaleString()}</p>
+              </article>
+            ))}
           </div>
-          <div className="cart-total-badge">
-            <span>Total a pagar:</span>
+
+          <section className="checkout-section compact">
+            <h3>Datos para finalizar compra</h3>
+            <div className="checkout-grid">
+              <div className="checkout-field">
+                <label htmlFor="nombre">Nombre*</label>
+                <input id="nombre" name="nombre" value={formData.nombre} onChange={handleChange} />
+                {errors.nombre && <span className="field-error">{errors.nombre}</span>}
+              </div>
+
+              <div className="checkout-field">
+                <label htmlFor="apellidos">Apellidos*</label>
+                <input id="apellidos" name="apellidos" value={formData.apellidos} onChange={handleChange} />
+                {errors.apellidos && <span className="field-error">{errors.apellidos}</span>}
+              </div>
+
+              <div className="checkout-field full">
+                <label htmlFor="correo">Correo*</label>
+                <input id="correo" name="correo" type="email" value={formData.correo} onChange={handleChange} />
+                {errors.correo && <span className="field-error">{errors.correo}</span>}
+              </div>
+
+              <div className="checkout-field">
+                <label htmlFor="calle">Calle*</label>
+                <input id="calle" name="calle" value={formData.calle} onChange={handleChange} />
+                {errors.calle && <span className="field-error">{errors.calle}</span>}
+              </div>
+
+              <div className="checkout-field">
+                <label htmlFor="departamento">Departamento</label>
+                <input id="departamento" name="departamento" value={formData.departamento} onChange={handleChange} />
+              </div>
+
+              <div className="checkout-field">
+                <label htmlFor="region">Región*</label>
+                <select id="region" name="region" value={formData.region} onChange={handleChange}>
+                  {regionesChile.map((region) => (
+                    <option key={region} value={region}>
+                      {region}
+                    </option>
+                  ))}
+                </select>
+                {errors.region && <span className="field-error">{errors.region}</span>}
+              </div>
+
+              <div className="checkout-field">
+                <label htmlFor="comuna">Comuna*</label>
+                <select id="comuna" name="comuna" value={formData.comuna} onChange={handleChange}>
+                  {comunasSugeridas.map((comuna) => (
+                    <option key={comuna} value={comuna}>
+                      {comuna}
+                    </option>
+                  ))}
+                </select>
+                {errors.comuna && <span className="field-error">{errors.comuna}</span>}
+              </div>
+            </div>
+          </section>
+        </section>
+
+        <section className="cart-summary-panel">
+          <header className="panel-header">
+            <h2>Carrito de Compras</h2>
+          </header>
+
+          <div className="cart-items-table-wrapper">
+            <table className="cart-items-table compact">
+              <thead>
+                <tr>
+                  <th>Imagen</th>
+                  <th>Nombre</th>
+                  <th>Precio</th>
+                  <th>Cantidad</th>
+                  <th>Subtotal</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                {cart.map((item) => (
+                  <tr key={item.id}>
+                    <td>
+                      <img src={item.imagen || '/favicon.svg'} alt={item.nombre} className="cart-item-image" />
+                    </td>
+                    <td>{item.nombre}</td>
+                    <td>$ {item.precio.toLocaleString()}</td>
+                    <td>
+                      <div className="qty-controls">
+                        <button type="button" onClick={() => updateCantidad(item.id, -1)}>
+                          -
+                        </button>
+                        <span>{item.cantidad}</span>
+                        <button type="button" onClick={() => updateCantidad(item.id, 1)}>
+                          +
+                        </button>
+                      </div>
+                    </td>
+                    <td>$ {(item.precio * item.cantidad).toLocaleString()}</td>
+                    <td>
+                      <button type="button" className="btn-delete-inline" onClick={() => removeFromCart(item.id)}>
+                        Eliminar
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          <div className="summary-total-row">
+            <span>Total</span>
             <strong>$ {total.toLocaleString()}</strong>
           </div>
-        </header>
 
-        <div className="cart-items-table-wrapper">
-          <table className="cart-items-table">
-            <thead>
-              <tr>
-                <th>Imagen</th>
-                <th>Nombre</th>
-                <th>Precio</th>
-                <th>Cantidad</th>
-                <th>Subtotal</th>
-                <th>Acción</th>
-              </tr>
-            </thead>
-            <tbody>
-              {cart.map((item) => (
-                <tr key={item.id}>
-                  <td>
-                    <img src={item.imagen || '/favicon.svg'} alt={item.nombre} className="cart-item-image" />
-                  </td>
-                  <td>{item.nombre}</td>
-                  <td>$ {item.precio.toLocaleString()}</td>
-                  <td>
-                    <div className="qty-controls">
-                      <button type="button" onClick={() => updateCantidad(item.id, -1)}>
-                        -
-                      </button>
-                      <span>{item.cantidad}</span>
-                      <button type="button" onClick={() => updateCantidad(item.id, 1)}>
-                        +
-                      </button>
-                    </div>
-                  </td>
-                  <td>$ {(item.precio * item.cantidad).toLocaleString()}</td>
-                  <td>
-                    <button type="button" className="btn-delete-inline" onClick={() => removeFromCart(item.id)}>
-                      Eliminar
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-
-        <section className="checkout-section">
-          <h2>Información del cliente</h2>
-          <p>Completa la siguiente información</p>
-
-          <div className="checkout-grid">
-            <div className="checkout-field">
-              <label htmlFor="nombre">Nombre*</label>
-              <input id="nombre" name="nombre" value={formData.nombre} onChange={handleChange} />
-              {errors.nombre && <span className="field-error">{errors.nombre}</span>}
-            </div>
-
-            <div className="checkout-field">
-              <label htmlFor="apellidos">Apellidos*</label>
-              <input id="apellidos" name="apellidos" value={formData.apellidos} onChange={handleChange} />
-              {errors.apellidos && <span className="field-error">{errors.apellidos}</span>}
-            </div>
-
-            <div className="checkout-field full">
-              <label htmlFor="correo">Correo*</label>
-              <input id="correo" name="correo" type="email" value={formData.correo} onChange={handleChange} />
-              {errors.correo && <span className="field-error">{errors.correo}</span>}
-            </div>
-          </div>
+          <footer className="checkout-footer compact-actions">
+            <button type="button" className="btn-clear" onClick={clearCart}>
+              Limpiar
+            </button>
+            <button type="submit" className="btn-pay">
+              Comprar ahora
+            </button>
+          </footer>
         </section>
-
-        <section className="checkout-section">
-          <h2>Dirección de entrega de los productos</h2>
-          <p>Ingrese dirección de forma detallada</p>
-
-          <div className="checkout-grid">
-            <div className="checkout-field">
-              <label htmlFor="calle">Calle*</label>
-              <input id="calle" name="calle" value={formData.calle} onChange={handleChange} />
-              {errors.calle && <span className="field-error">{errors.calle}</span>}
-            </div>
-
-            <div className="checkout-field">
-              <label htmlFor="departamento">Departamento (opcional)</label>
-              <input id="departamento" name="departamento" value={formData.departamento} onChange={handleChange} />
-            </div>
-
-            <div className="checkout-field">
-              <label htmlFor="region">Región*</label>
-              <select id="region" name="region" value={formData.region} onChange={handleChange}>
-                {regionesChile.map((region) => (
-                  <option key={region} value={region}>
-                    {region}
-                  </option>
-                ))}
-              </select>
-              {errors.region && <span className="field-error">{errors.region}</span>}
-            </div>
-
-            <div className="checkout-field">
-              <label htmlFor="comuna">Comuna*</label>
-              <select id="comuna" name="comuna" value={formData.comuna} onChange={handleChange}>
-                {comunasSugeridas.map((comuna) => (
-                  <option key={comuna} value={comuna}>
-                    {comuna}
-                  </option>
-                ))}
-              </select>
-              {errors.comuna && <span className="field-error">{errors.comuna}</span>}
-            </div>
-
-            <div className="checkout-field full">
-              <label htmlFor="indicaciones">Indicaciones para la entrega (opcional)</label>
-              <textarea
-                id="indicaciones"
-                name="indicaciones"
-                placeholder="Ej: Entre calles, color del edificio, no tiene timbre."
-                value={formData.indicaciones}
-                onChange={handleChange}
-              />
-            </div>
-          </div>
-        </section>
-
-        <footer className="checkout-footer">
-          <button type="submit" className="btn-pay">
-            Pagar ahora $ {total.toLocaleString()}
-          </button>
-        </footer>
       </form>
 
       {showConfirmModal && (
